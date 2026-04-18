@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebCraft · Desktop Builder</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ===== BUILDER CORE STYLES ===== */
+    :root {
+      --primary: #00ffff;
+      --primary-glow: rgba(0, 255, 255, 0.5);
+      --danger: #ff0066;
+      --danger-glow: rgba(255, 0, 102, 0.5);
+      --warning: #ffaa00;
+      --success: #00ff99;
+      --dark: #0a0a0f;
+      --darker: #050508;
+      --light: #f0f0ff;
+      --gray: #2a2a35;
+      --glass: rgba(255, 255, 255, 0.05);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--dark);
+      color: var(--light);
+      height: 100vh;
+      overflow: hidden;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.light-mode {
+      --dark: #f5f7fa;
+      --darker: #ffffff;
+      --light: #1a1a2e;
+      --gray: #d1d5db;
+      --glass: rgba(0, 0, 0, 0.03);
+    }
+    body.light-mode .website-canvas,
+    body.light-mode .element-card,
+    body.light-mode .btn,
+    body.light-mode .prop-group input,
+    body.light-mode .prop-group select,
+    body.light-mode .prop-group textarea {
+      color: #1a1a2e !important;
+    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--gray); }
+    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+    .app { display: flex; flex-direction: column; height: 100vh; }
+    .top-bar {
+      background: var(--darker);
+      border-bottom: 1px solid var(--gray);
+      padding: 0.8rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .logo {
+      font-size: 1.8rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--success));
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent; text-shadow: 0 0 20px var(--primary-glow);
+    }
+    .top-actions { display: flex; gap: 12px; }
+    .btn {
+      padding: 0.6rem 1.4rem; border-radius: 40px; border: 1px solid var(--gray);
+      background: var(--glass); color: var(--light); font-weight: 600;
+      cursor: pointer; transition: all 0.2s; display: inline-flex;
+      align-items: center; gap: 8px; backdrop-filter: blur(5px);
+    }
+    .btn:hover {
+      background: var(--primary); color: var(--darker);
+      border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow);
+      transform: translateY(-2px);
+    }
+    .btn-primary { background: var(--primary); color: var(--darker); }
+    .btn-danger:hover { background: var(--danger); box-shadow: 0 0 15px var(--danger-glow); }
+    .main-layout { display: flex; flex: 1; overflow: hidden; }
+    .left-panel {
+      width: 300px; background: var(--darker); border-right: 1px solid var(--gray);
+      padding: 1.5rem 1rem; overflow-y: auto;
+    }
+    .panel-header h3 { color: var(--primary); text-shadow: 0 0 8px var(--primary-glow); }
+    .hint { font-size: 0.8rem; opacity: 0.7; margin-bottom: 20px; }
+    .elements-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .element-card {
+      background: var(--glass); border: 1px solid var(--gray); border-radius: 16px;
+      padding: 14px 8px; text-align: center; cursor: grab; transition: 0.2s;
+      color: var(--light); backdrop-filter: blur(4px);
+    }
+    .element-card i { color: var(--primary); }
+    .element-card:hover {
+      background: var(--primary); color: var(--darker);
+      box-shadow: 0 0 18px var(--primary-glow); transform: translateY(-3px);
+    }
+    .templates-section { margin-top: 30px; border-top: 1px solid var(--gray); padding-top: 20px; }
+    .templates-section h4 { color: var(--warning); margin-bottom: 12px; }
+    .templates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .template-btn {
+      width: 100%; padding: 12px 8px; border-radius: 30px;
+      border: 1px solid var(--gray); background: var(--glass); color: var(--light);
+      cursor: pointer; text-align: left; font-size: 0.9rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .template-btn i { width: 20px; color: var(--warning); }
+    .template-btn:hover { background: var(--warning); color: var(--darker); }
+    .canvas-wrapper {
+      flex: 1; background: var(--dark); padding: 24px;
+      display: flex; flex-direction: column; overflow: auto; position: relative;
+    }
+    .floating-blocks {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 1; pointer-events: none;
+    }
+    .floating-block {
+      position: absolute; background: var(--glass); border: 1px solid var(--gray);
+      border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+      backdrop-filter: blur(8px); box-shadow: 0 0 30px rgba(0,255,255,0.1);
+      animation: floatBlock 20s infinite ease-in-out;
+    }
+    @keyframes floatBlock {
+      0% { transform: translate(0,0) rotate(0deg); }
+      33% { transform: translate(40px,-50px) rotate(120deg); }
+      66% { transform: translate(-30px,30px) rotate(240deg); }
+      100% { transform: translate(0,0) rotate(360deg); }
+    }
+    .floating-block:nth-child(1) { width: 200px; height: 200px; top: 5%; left: 5%; }
+    .floating-block:nth-child(2) { width: 150px; height: 150px; bottom: 15%; right: 10%; animation-delay: -5s; }
+    .floating-block:nth-child(3) { width: 250px; height: 120px; top: 40%; left: 60%; animation-delay: -2s; }
+    .canvas-header {
+      display: flex; justify-content: space-between; margin-bottom: 16px;
+      color: var(--light); position: relative; z-index: 3;
+    }
+    .selected-info { font-weight: 600; color: var(--primary); }
+    .canvas-container { flex: 1; display: flex; justify-content: center; position: relative; z-index: 3; }
+    .website-canvas {
+      background: var(--glass); backdrop-filter: blur(12px);
+      border: 1px solid var(--gray); color: var(--light);
+      min-height: 100%; width: 100%; border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px var(--primary-glow);
+      padding: 28px; outline: none; position: relative;
+    }
+    .website-canvas.drag-over { box-shadow: 0 0 30px var(--primary-glow), 0 0 0 2px var(--primary); }
+    .empty-canvas-message {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      text-align: center; color: var(--light); opacity: 0.7; pointer-events: none;
+    }
+    .canvas-element {
+      position: relative; margin: 12px 0; transition: outline 0.1s;
+    }
+    .canvas-element.selected {
+      outline: 2px solid var(--primary); outline-offset: 4px;
+      border-radius: 8px; box-shadow: 0 0 20px var(--primary-glow);
+    }
+    [contenteditable="true"]:focus {
+      outline: 2px dashed var(--success); background: rgba(0,255,153,0.1);
+      padding: 6px; border-radius: 8px;
+    }
+    .quick-toolbar {
+      position: absolute; z-index: 100; display: none;
+      background: var(--darker); border: 1px solid var(--primary);
+      border-radius: 50px; padding: 6px 10px;
+      box-shadow: 0 0 20px var(--primary-glow);
+      backdrop-filter: blur(8px);
+      align-items: center; gap: 4px;
+    }
+    .quick-toolbar.visible { display: flex; }
+    .quick-btn {
+      background: transparent; border: none; color: var(--light);
+      width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: 0.2s; font-size: 1rem;
+    }
+    .quick-btn:hover { background: var(--primary); color: var(--darker); }
+    .layers-panel {
+      position: absolute; right: 360px; top: 120px; width: 220px;
+      background: var(--darker); border: 1px solid var(--primary);
+      border-radius: 20px; padding: 16px; box-shadow: 0 0 25px var(--primary-glow);
+      backdrop-filter: blur(8px); z-index: 200; display: none;
+    }
+    .layers-panel.visible { display: block; }
+    .layers-header {
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--primary); margin-bottom: 12px;
+    }
+    .layer-item {
+      padding: 8px 12px; margin: 4px 0; background: var(--glass);
+      border-radius: 12px; cursor: pointer; display: flex; align-items: center;
+      gap: 8px; color: var(--light); border: 1px solid transparent;
+    }
+    .layer-item.active { border-color: var(--primary); background: var(--primary-glow); }
+    .right-panel {
+      width: 340px; background: var(--darker); border-left: 1px solid var(--gray);
+      display: flex; flex-direction: column;
+    }
+    .panel-tabs {
+      display: flex; border-bottom: 1px solid var(--gray); background: var(--glass);
+    }
+    .tab-btn {
+      flex: 1; padding: 14px 4px; background: transparent; border: none;
+      font-weight: 600; color: var(--light); opacity: 0.7; cursor: pointer;
+      border-bottom: 2px solid transparent; transition: 0.2s;
+    }
+    .tab-btn.active {
+      opacity: 1; color: var(--primary); border-bottom-color: var(--primary);
+      text-shadow: 0 0 8px var(--primary-glow);
+    }
+    .panel-content { flex: 1; padding: 20px 16px; overflow-y: auto; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+    .style-editor-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 20px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--gray);
+    }
+    .style-editor-header i { color: var(--primary); font-size: 1.4rem; }
+    .style-editor-header span { font-weight: 700; color: var(--primary); text-transform: uppercase; }
+    .prop-group { margin-bottom: 20px; }
+    .prop-group label {
+      display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px;
+      color: var(--primary); text-transform: uppercase;
+    }
+    .prop-group input, .prop-group select, .prop-group textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--gray);
+      border-radius: 14px; background: var(--glass); color: var(--light);
+    }
+    .prop-group input:focus, .prop-group select:focus {
+      border-color: var(--primary); box-shadow: 0 0 12px var(--primary-glow);
+    }
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-content {
+      background: var(--darker); border: 1px solid var(--primary);
+      box-shadow: 0 0 40px var(--primary-glow); color: var(--light);
+      padding: 28px; border-radius: 28px; width: 700px;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="top-bar">
+    <div class="logo">⚡ WebCraft</div>
+    <div class="top-actions">
+      <button class="btn" id="themeToggle"><i class="fas fa-moon"></i> Light</button>
+      <button class="btn" id="layersToggle"><i class="fas fa-layer-group"></i> Layers</button>
+      <button class="btn" id="undoBtn"><i class="fas fa-undo-alt"></i> Undo</button>
+      <button class="btn" id="redoBtn"><i class="fas fa-redo-alt"></i> Redo</button>
+      <button class="btn" id="saveBtn"><i class="fas fa-save"></i> Save</button>
+      <button class="btn" id="loadBtn"><i class="fas fa-folder-open"></i> Load</button>
+      <button class="btn btn-primary" id="exportBtn"><i class="fas fa-code"></i> Export</button>
+      <button class="btn btn-danger" id="clearCanvasBtn"><i class="fas fa-trash-alt"></i> Clear</button>
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <aside class="left-panel">
+      <div class="panel-header">
+        <h3>🧩 Components</h3>
+        <p class="hint">Drag onto canvas →</p>
+      </div>
+      <div class="elements-grid">
+        <div class="element-card" data-type="heading" draggable="true"><i class="fas fa-heading"></i> Heading</div>
+        <div class="element-card" data-type="paragraph" draggable="true"><i class="fas fa-paragraph"></i> Text</div>
+        <div class="element-card" data-type="image" draggable="true"><i class="fas fa-image"></i> Image</div>
+        <div class="element-card" data-type="button" draggable="true"><i class="fas fa-square"></i> Button</div>
+        <div class="element-card" data-type="divider" draggable="true"><i class="fas fa-minus"></i> Divider</div>
+        <div class="element-card" data-type="container" draggable="true"><i class="fas fa-cube"></i> Container</div>
+        <div class="element-card" data-type="card" draggable="true"><i class="fas fa-id-card"></i> Card</div>
+        <div class="element-card" data-type="navbar" draggable="true"><i class="fas fa-bars"></i> Navbar</div>
+        <div class="element-card" data-type="footer" draggable="true"><i class="fas fa-shoe-prints"></i> Footer</div>
+        <div class="element-card" data-type="grid" draggable="true"><i class="fas fa-th"></i> Grid</div>
+      </div>
+      <div class="templates-section">
+        <h4>📦 Templates (10)</h4>
+        <div class="templates-grid">
+          <button class="template-btn" data-template="landing"><i class="fas fa-rocket"></i> Landing</button>
+          <button class="template-btn" data-template="portfolio"><i class="fas fa-palette"></i> Portfolio</button>
+          <button class="template-btn" data-template="blog"><i class="fas fa-newspaper"></i> Blog</button>
+          <button class="template-btn" data-template="business"><i class="fas fa-briefcase"></i> Business</button>
+          <button class="template-btn" data-template="personal"><i class="fas fa-user"></i> Personal</button>
+          <button class="template-btn" data-template="restaurant"><i class="fas fa-utensils"></i> Restaurant</button>
+          <button class="template-btn" data-template="comingsoon"><i class="fas fa-clock"></i> Coming Soon</button>
+          <button class="template-btn" data-template="ecommerce"><i class="fas fa-shopping-cart"></i> eCommerce</button>
+          <button class="template-btn" data-template="agency"><i class="fas fa-chart-line"></i> Agency</button>
+          <button class="template-btn" data-template="responsiveDemo"><i class="fas fa-mobile-alt"></i> Responsive Demo</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="canvas-wrapper">
+      <div class="floating-blocks">
+        <div class="floating-block"></div><div class="floating-block"></div><div class="floating-block"></div>
+      </div>
+      <div class="canvas-header">
+        <span class="selected-info" id="selectedInfo">👆 Click any element to edit</span>
+      </div>
+      <div class="canvas-container">
+        <div class="website-canvas" id="canvas" dropzone="move">
+          <div class="empty-canvas-message" id="emptyMessage">
+            <i class="fas fa-hand-pointer"></i>
+            <h3>Start building</h3>
+            <p>Drag elements or pick a template</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="layers-panel" id="layersPanel">
+        <div class="layers-header">
+          <span><i class="fas fa-layer-group"></i> Layers</span>
+          <button class="quick-btn" id="closeLayersBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="layersList"></div>
+      </div>
+
+      <div class="quick-toolbar" id="quickToolbar">
+        <button class="quick-btn" data-action="edit-text" title="Edit text"><i class="fas fa-pencil-alt"></i></button>
+        <button class="quick-btn" data-action="change-color" title="Change color"><i class="fas fa-palette"></i></button>
+        <button class="quick-btn" data-action="align-left" title="Align left"><i class="fas fa-align-left"></i></button>
+        <button class="quick-btn" data-action="align-center" title="Align center"><i class="fas fa-align-center"></i></button>
+        <button class="quick-btn" data-action="align-right" title="Align right"><i class="fas fa-align-right"></i></button>
+        <button class="quick-btn" data-action="bring-forward" title="Bring forward"><i class="fas fa-arrow-up"></i></button>
+        <button class="quick-btn" data-action="send-backward" title="Send backward"><i class="fas fa-arrow-down"></i></button>
+        <button class="quick-btn" data-action="duplicate" title="Duplicate"><i class="fas fa-copy"></i></button>
+        <button class="quick-btn" data-action="delete" title="Delete"><i class="fas fa-trash"></i></button>
+      </div>
+    </main>
+
+    <aside class="right-panel">
+      <div class="panel-tabs">
+        <button class="tab-btn active" data-tab="content">Content</button>
+        <button class="tab-btn" data-tab="style">Style</button>
+        <button class="tab-btn" data-tab="layout">Layout</button>
+        <button class="tab-btn" data-tab="advanced">Advanced</button>
+      </div>
+      <div class="panel-content" id="panelContent">
+        <!-- Content Tab -->
+        <div class="tab-pane active" id="tab-content">
+          <div class="style-editor-header"><i class="fas fa-edit"></i><span>Edit Content</span></div>
+          <div class="prop-group"><label>Text / Label</label><input type="text" id="contentText" placeholder="Type here..."></div>
+          <div id="imageControls" style="display:none;">
+            <div class="prop-group"><label>Image URL</label><input type="text" id="imageUrl" placeholder="https://..."></div>
+            <div class="prop-group"><label>Width</label><input type="text" id="imageWidth" placeholder="300px"></div>
+            <div class="prop-group"><label>Height</label><input type="text" id="imageHeight" placeholder="auto"></div>
+            <button class="btn small-btn" id="applyImageBtn">Apply Image</button>
+          </div>
+          <div id="buttonLabelGroup" style="display:none;">
+            <div class="prop-group"><label>Button text</label><input type="text" id="buttonLabel"></div>
+          </div>
+        </div>
+        <!-- Style Tab -->
+        <div class="tab-pane" id="tab-style">
+          <div class="style-editor-header"><i class="fas fa-paint-brush"></i><span>Visual Style</span></div>
+          <div class="prop-group"><label>Font</label><select id="fontFamily"><option value="">Default</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option></select></div>
+          <div class="prop-group"><label>Size</label><input type="text" id="fontSize" placeholder="16px"></div>
+          <div class="prop-group"><label>Text color</label><input type="color" id="textColor" value="#f0f0ff"></div>
+          <div class="prop-group"><label>Background</label><input type="color" id="bgColor" value="#2a2a35"><input type="text" id="bgGradient" placeholder="gradient" style="margin-top:6px;"></div>
+          <div class="prop-group"><label>Border radius</label><input type="text" id="borderRadius" placeholder="8px"></div>
+          <div class="prop-group"><label>Box shadow</label><input type="text" id="boxShadow" placeholder="0 4px 12px rgba(0,0,0,0.2)"></div>
+          <div class="prop-group"><label>Text align</label><select id="textAlign"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></div>
+        </div>
+        <!-- Layout Tab -->
+        <div class="tab-pane" id="tab-layout">
+          <div class="style-editor-header"><i class="fas fa-arrows-alt"></i><span>Spacing & Size</span></div>
+          <div class="prop-group"><label>Margin</label><input type="text" id="margin" placeholder="10px"></div>
+          <div class="prop-group"><label>Padding</label><input type="text" id="padding" placeholder="15px"></div>
+          <div class="prop-group"><label>Width</label><input type="text" id="width" placeholder="auto"></div>
+          <div class="prop-group"><label>Height</label><input type="text" id="height" placeholder="auto"></div>
+          <div class="prop-group"><label>Flex align</label><select id="flexAlign"><option value="flex-start">Start</option><option value="center">Center</option><option value="flex-end">End</option></select></div>
+        </div>
+        <!-- Advanced Tab -->
+        <div class="tab-pane" id="tab-advanced">
+          <div class="style-editor-header"><i class="fas fa-code"></i><span>Advanced</span></div>
+          <div class="prop-group"><label>Custom CSS</label><textarea id="customCss" rows="3"></textarea></div>
+          <div class="prop-group"><label>Visibility</label><select id="visibility"><option value="visible">Visible</option><option value="hidden">Hidden</option></select></div>
+          <button class="btn" id="duplicateBtn" style="width:100%; margin-bottom:10px;"><i class="fas fa-copy"></i> Duplicate</button>
+          <button class="btn btn-danger" id="deleteBtn" style="width:100%;"><i class="fas fa-trash"></i> Delete</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal" id="exportModal">
+  <div class="modal-content">
+    <h3><i class="fas fa-code"></i> Export HTML</h3>
+    <textarea id="exportCode" rows="14" readonly></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="copyCodeBtn"><i class="fas fa-copy"></i> Copy</button>
+      <button class="btn" id="downloadBtn"><i class="fas fa-download"></i> Download</button>
+      <button class="btn" id="closeModalBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    "use strict";
+    let elements = [];
+    let selectedIndex = -1;
+    let historyStack = [];
+    let historyIndex = -1;
+    const MAX_HISTORY = 50;
+
+    // Base templates
+    const defaultTemplates = {
+      heading: { tag:'h2', content:'Neon Heading', styles:{ fontSize:'36px', fontWeight:'bold', color:'var(--primary)', textShadow:'0 0 15px var(--primary-glow)' } },
+      paragraph: { tag:'p', content:'Your content here. Edit me!', styles:{ fontSize:'16px' } },
+      image: { tag:'img', src:'https://placehold.co/600x400/2a2a35/00ffff?text=NEON+IMAGE', styles:{ maxWidth:'100%', borderRadius:'16px' } },
+      button: { tag:'button', content:'Click Me', styles:{ padding:'14px 28px', background:'var(--primary)', color:'var(--darker)', border:'none', borderRadius:'40px', fontSize:'16px', fontWeight:'bold', boxShadow:'0 0 15px var(--primary-glow)' } },
+      divider: { tag:'hr', styles:{ margin:'24px 0', border:'1px solid var(--gray)' } },
+      container: { tag:'div', content:'', styles:{ padding:'24px', background:'var(--glass)', borderRadius:'20px', border:'1px solid var(--gray)' } },
+      card: { tag:'div', content:'<img src="https://placehold.co/300x180/1a1a2e/00ffff?text=CARD" style="width:100%;border-radius:16px"/><h3 style="margin-top:12px;">Card Title</h3><p>Description here</p>', styles:{ padding:'20px', background:'var(--glass)', borderRadius:'24px', border:'1px solid var(--gray)', boxShadow:'0 8px 20px rgba(0,0,0,0.3)' } },
+      navbar: { tag:'nav', content:'Home | About | Contact', styles:{ display:'flex', gap:'32px', padding:'18px', background:'var(--glass)', borderRadius:'40px', border:'1px solid var(--gray)' } },
+      footer: { tag:'footer', content:'© 2026 WebCraft — Built with ⚡', styles:{ padding:'24px', textAlign:'center', borderTop:'1px solid var(--gray)' } },
+      grid: { tag:'div', content:'<div>Item 1</div><div>Item 2</div><div>Item 3</div>', styles:{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'20px' } }
+    };
+
+    // Additional template presets (return arrays of elements)
+    const templatePresets = {
+      landing: () => [
+        { ...defaultTemplates.heading, content:'Build the Future', id:genId() },
+        { ...defaultTemplates.button, content:'Get Started', id:genId() },
+        { ...defaultTemplates.container, id:genId() }
+      ],
+      portfolio: () => [
+        { ...defaultTemplates.heading, content:'My Work', id:genId() },
+        { ...defaultTemplates.grid, id:genId() }
+      ],
+      blog: () => [
+        { ...defaultTemplates.heading, content:'Blog Post', id:genId() },
+        { ...defaultTemplates.paragraph, id:genId() }
+      ],
+      business: () => [
+        { ...defaultTemplates.navbar, content:'🏢 Company | Services | Contact', id:genId() },
+        { ...defaultTemplates.heading, content:'Grow Your Business', styles:{ ...defaultTemplates.heading.styles, textAlign:'center' }, id:genId() },
+        { ...defaultTemplates.paragraph, content:'We provide innovative solutions.', styles:{ textAlign:'center' }, id:genId() },
+        { ...defaultTemplates.grid, content:'<div>Analytics</div><div>Team</div><div>Automation</div>', styles:{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'20px' }, id:genId() },
+        { ...defaultTemplates.button, content:'Get a Quote', id:genId() }
+      ],
+      personal: () => [
+        { ...defaultTemplates.image, src:'https://placehold.co/200x200/00ffff/1a1a2e?text=Avatar', styles:{ width:'120px', borderRadius:'50%', margin:'0 auto', display:'block' }, id:genId() },
+        { ...defaultTemplates.heading, content:'Jane Doe', styles:{ textAlign:'center' }, id:genId() },
+        { ...defaultTemplates.paragraph, content:'Frontend Developer', styles:{ textAlign:'center' }, id:genId() }
+      ],
+      restaurant: () => [
+        { ...defaultTemplates.heading, content:'🍽️ The Neon Bistro', styles:{ textAlign:'center' }, id:genId() },
+        { ...defaultTemplates.image, src:'https://placehold.co/600x300/ffaa00/1a1a2e?text=Delicious+Food', id:genId() },
+        { ...defaultTemplates.grid, content:'<div>Pizza</div><div>Burgers</div><div>Salads</div>', id:genId() }
+      ],
+      comingsoon: () => [
+        { ...defaultTemplates.container, content:'<h1>🚀 Something Awesome</h1><h2>Is Coming Soon</h2><p>We are working hard.</p>', styles:{ textAlign:'center', padding:'40px' }, id:genId() }
+      ],
+      ecommerce: () => [
+        { ...defaultTemplates.navbar, content:'🛍️ Shop | Deals | Cart', id:genId() },
+        { ...defaultTemplates.heading, content:'Summer Sale', id:genId() },
+        { ...defaultTemplates.grid, content:'<div><img src="https://placehold.co/200/00ffff/1a1a2e?text=Product"/><p>$29</p></div><div><img src="https://placehold.co/200/ff0066/1a1a2e?text=Product"/><p>$49</p></div>', id:genId() }
+      ],
+      agency: () => [
+        { ...defaultTemplates.heading, content:'Creative Agency', id:genId() },
+        { ...defaultTemplates.paragraph, content:'We design brands that stand out.', id:genId() },
+        { ...defaultTemplates.container, content:'<h3>Our Work</h3><div style="display:flex;gap:16px;">Project A / Project B</div>', id:genId() }
+      ],
+      responsiveDemo: () => [
+        { ...defaultTemplates.heading, content:'📱 Responsive Boxes Demo', styles:{ textAlign:'center' }, id:genId() },
+        { tag:'style', content:`.resp-container { display: flex; gap: 20px; } .resp-box { flex: 1; padding: 20px; background: #f2f2f2; color: #1a1a2e; border-radius: 16px; } @media (max-width: 768px) { .resp-container { flex-direction: column; } } @media (max-width: 480px) { .resp-box { padding: 15px; } }`, id:genId() },
+        { tag:'div', content:'<div class="resp-container"><div class="resp-box">Box 1</div><div class="resp-box">Box 2</div><div class="resp-box">Box 3</div></div>', styles:{ marginTop:'20px' }, id:genId() }
+      ]
+    };
+
+    const canvas = document.getElementById('canvas');
+    const emptyMessage = document.getElementById('emptyMessage');
+    const selectedInfo = document.getElementById('selectedInfo');
+    const quickToolbar = document.getElementById('quickToolbar');
+    const layersPanel = document.getElementById('layersPanel');
+    const layersList = document.getElementById('layersList');
+
+    function genId() { return 'el_' + Date.now() + '_' + Math.random().toString(36); }
+
+    function renderCanvas() {
+      canvas.innerHTML = '';
+      if (elements.length === 0) {
+        emptyMessage.style.display = 'block';
+      } else {
+        emptyMessage.style.display = 'none';
+        elements.forEach((el, idx) => {
+          if (el.tag === 'style') {
+            const styleEl = document.createElement('style');
+            styleEl.textContent = el.content;
+            canvas.appendChild(styleEl);
+            return;
+          }
+          const wrapper = document.createElement('div');
+          wrapper.className = 'canvas-element';
+          wrapper.dataset.index = idx;
+          wrapper.dataset.type = el.type || 'custom';
+          wrapper.setAttribute('draggable', 'true');
+          
+          let inner;
+          if (el.type === 'image') {
+            inner = document.createElement('img');
+            inner.src = el.src || '';
+          } else {
+            inner = document.createElement(el.tag || 'div');
+            if (['heading','paragraph','button'].includes(el.type)) {
+              inner.textContent = el.content || '';
+              inner.setAttribute('contenteditable', 'true');
+            } else if (el.content !== undefined) {
+              inner.innerHTML = el.content;
+            }
+          }
+          
+          const styles = el.styles || {};
+          Object.entries(styles).forEach(([p,v]) => { if(v) inner.style[p] = v; });
+          if (el.customCss) inner.style.cssText += ';' + el.customCss;
+          if (el.visibility === 'hidden') inner.style.display = 'none';
+          
+          wrapper.appendChild(inner);
+          wrapper.addEventListener('click', (e) => { e.stopPropagation(); selectElement(idx); });
+          if (inner.contentEditable === 'true') {
+            inner.addEventListener('input', () => { elements[idx].content = inner.textContent; pushHistory(); });
+          }
+          wrapper.addEventListener('dragstart', handleDragStart);
+          canvas.appendChild(wrapper);
+        });
+      }
+      highlightSelected();
+      updateLayersList();
+    }
+
+    function highlightSelected() {
+      document.querySelectorAll('.canvas-element').forEach(el => el.classList.remove('selected'));
+      if (selectedIndex >= 0 && canvas.children[selectedIndex] && canvas.children[selectedIndex].classList.contains('canvas-element')) {
+        canvas.children[selectedIndex].classList.add('selected');
+        positionQuickToolbar(canvas.children[selectedIndex]);
+        quickToolbar.classList.add('visible');
+      } else {
+        quickToolbar.classList.remove('visible');
+      }
+      updateSelectedInfo();
+    }
+
+    function positionQuickToolbar(el) {
+      const rect = el.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
+      quickToolbar.style.left = (rect.right - canvasRect.left + 10) + 'px';
+      quickToolbar.style.top = (rect.top - canvasRect.top - 10) + 'px';
+    }
+
+    function selectElement(index) {
+      if (index < 0 || index >= elements.length) return;
+      selectedIndex = index;
+      renderCanvas();
+      populateStylePanel(elements[index]);
+    }
+
+    function populateStylePanel(el) {
+      const isImage = el.type === 'image';
+      document.getElementById('imageControls').style.display = isImage ? 'block' : 'none';
+      document.getElementById('buttonLabelGroup').style.display = el.type === 'button' ? 'block' : 'none';
+      document.getElementById('contentText').value = el.content || '';
+      if (isImage) {
+        document.getElementById('imageUrl').value = el.src || '';
+        document.getElementById('imageWidth').value = el.styles?.width || '';
+        document.getElementById('imageHeight').value = el.styles?.height || '';
+      }
+      document.getElementById('buttonLabel').value = el.content || '';
+      const s = el.styles || {};
+      document.getElementById('fontFamily').value = s.fontFamily || '';
+      document.getElementById('fontSize').value = s.fontSize || '';
+      document.getElementById('textColor').value = s.color || '#f0f0ff';
+      document.getElementById('bgColor').value = s.backgroundColor || '#2a2a35';
+      document.getElementById('bgGradient').value = s.background || '';
+      document.getElementById('borderRadius').value = s.borderRadius || '';
+      document.getElementById('boxShadow').value = s.boxShadow || '';
+      document.getElementById('textAlign').value = s.textAlign || 'left';
+      document.getElementById('margin').value = s.margin || '';
+      document.getElementById('padding').value = s.padding || '';
+      document.getElementById('width').value = s.width || '';
+      document.getElementById('height').value = s.height || '';
+      document.getElementById('flexAlign').value = s.justifyContent || 'flex-start';
+      document.getElementById('customCss').value = el.customCss || '';
+      document.getElementById('visibility').value = el.visibility || 'visible';
+    }
+
+    function updateSelectedInfo() {
+      selectedInfo.textContent = selectedIndex >= 0 ? `✏️ Editing: ${elements[selectedIndex].type || 'element'}` : '👆 Click any element to edit';
+    }
+
+    function updateLayersList() {
+      layersList.innerHTML = elements.filter(el => el.tag !== 'style').map((el, i) => {
+        const actualIndex = elements.indexOf(el);
+        return `<div class="layer-item ${actualIndex === selectedIndex ? 'active' : ''}" data-index="${actualIndex}">
+          <i class="fas fa-${el.type === 'image' ? 'image' : 'cube'}"></i>
+          <span style="flex:1;">${el.type || 'element'} ${actualIndex+1}</span>
+        </div>`;
+      }).join('');
+      document.querySelectorAll('.layer-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          const idx = parseInt(item.dataset.index);
+          selectElement(idx);
+          layersPanel.classList.remove('visible');
+        });
+      });
+    }
+
+    function handleDragStart(e) {
+      const wrapper = e.target.closest('.canvas-element');
+      if (wrapper) e.dataTransfer.setData('text/plain', `reorder:${wrapper.dataset.index}`);
+      else {
+        const type = e.target.dataset.type;
+        if (type) e.dataTransfer.setData('text/plain', `new:${type}`);
+      }
+    }
+
+    canvas.addEventListener('dragover', (e) => { e.preventDefault(); canvas.classList.add('drag-over'); });
+    canvas.addEventListener('dragleave', () => canvas.classList.remove('drag-over'));
+    canvas.addEventListener('drop', (e) => {
+      e.preventDefault(); canvas.classList.remove('drag-over');
+      const data = e.dataTransfer.getData('text/plain');
+      if (!data) return;
+      if (data.startsWith('new:')) addElement(data.split(':')[1]);
+      else if (data.startsWith('reorder:')) {
+        const fromIdx = parseInt(data.split(':')[1]);
+        const children = [...canvas.children].filter(c => c.classList.contains('canvas-element'));
+        let targetIdx = elements.length;
+        const dropY = e.clientY;
+        for (let i=0; i<children.length; i++) {
+          if (dropY < children[i].getBoundingClientRect().top + children[i].offsetHeight/2) { targetIdx = elements.indexOf(elements.find(el => canvas.children[Array.from(canvas.children).indexOf(children[i])] === children[i])); break; }
+        }
+        if (fromIdx !== targetIdx) {
+          const [moved] = elements.splice(fromIdx, 1);
+          elements.splice(targetIdx, 0, moved);
+          pushHistory(); renderCanvas();
+        }
+      }
+    });
+
+    function addElement(type) {
+      const tpl = defaultTemplates[type] || defaultTemplates.container;
+      elements.push({ id: genId(), type, tag: tpl.tag, content: tpl.content || '', src: tpl.src, styles: { ...tpl.styles } });
+      pushHistory(); renderCanvas(); selectElement(elements.length-1);
+    }
+
+    function pushHistory() {
+      const snap = JSON.parse(JSON.stringify(elements));
+      historyStack = historyStack.slice(0, historyIndex+1);
+      historyStack.push(snap);
+      if (historyStack.length > MAX_HISTORY) historyStack.shift();
+      historyIndex = historyStack.length-1;
+    }
+    function undo() { if (historyIndex>0) { historyIndex--; elements=JSON.parse(JSON.stringify(historyStack[historyIndex])); renderCanvas(); selectedIndex=-1; } }
+    function redo() { if (historyIndex<historyStack.length-1) { historyIndex++; elements=JSON.parse(JSON.stringify(historyStack[historyIndex])); renderCanvas(); selectedIndex=-1; } }
+
+    function attachEvents() {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', (e) => {
+        const tab = e.target.dataset.tab;
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        e.target.classList.add('active');
+      }));
+
+      document.getElementById('contentText').addEventListener('input', e => updateSelected('content', e.target.value));
+      document.getElementById('buttonLabel').addEventListener('input', e => updateSelected('content', e.target.value));
+      document.getElementById('applyImageBtn').addEventListener('click', () => {
+        if (selectedIndex<0 || elements[selectedIndex].type!=='image') return;
+        const el = elements[selectedIndex];
+        el.src = document.getElementById('imageUrl').value;
+        if (!el.styles) el.styles = {};
+        const w = document.getElementById('imageWidth').value, h = document.getElementById('imageHeight').value;
+        if (w) el.styles.width = w; else delete el.styles.width;
+        if (h) el.styles.height = h; else delete el.styles.height;
+        pushHistory(); renderCanvas();
+      });
+
+      const styleIds = ['fontFamily','fontSize','textColor','bgColor','bgGradient','borderRadius','boxShadow','textAlign','margin','padding','width','height','flexAlign','customCss','visibility'];
+      styleIds.forEach(id => {
+        document.getElementById(id).addEventListener('input', e => {
+          if (selectedIndex<0) return;
+          const el = elements[selectedIndex];
+          if (id==='customCss') el.customCss = e.target.value;
+          else if (id==='visibility') { el.visibility = e.target.value; renderCanvas(); }
+          else {
+            if (!el.styles) el.styles = {};
+            let prop = id;
+            if (id==='textColor') prop='color';
+            else if (id==='bgColor') prop='backgroundColor';
+            else if (id==='bgGradient') prop='background';
+            else if (id==='flexAlign') prop='justifyContent';
+            el.styles[prop] = e.target.value;
+          }
+          renderCanvas(); pushHistory();
+        });
+      });
+
+      document.getElementById('undoBtn').addEventListener('click', undo);
+      document.getElementById('redoBtn').addEventListener('click', redo);
+      document.getElementById('saveBtn').addEventListener('click', () => { localStorage.setItem('wc_desktop', JSON.stringify(elements)); alert('Saved!'); });
+      document.getElementById('loadBtn').addEventListener('click', () => {
+        const saved = localStorage.getItem('wc_desktop');
+        if (saved) { elements = JSON.parse(saved); pushHistory(); renderCanvas(); selectedIndex=-1; }
+      });
+      document.getElementById('deleteBtn').addEventListener('click', () => { if(selectedIndex>=0) { elements.splice(selectedIndex,1); pushHistory(); renderCanvas(); selectedIndex=-1; } });
+      document.getElementById('duplicateBtn').addEventListener('click', () => {
+        if (selectedIndex>=0) { const clone = JSON.parse(JSON.stringify(elements[selectedIndex])); clone.id = genId(); elements.splice(selectedIndex+1,0,clone); pushHistory(); renderCanvas(); }
+      });
+      document.getElementById('clearCanvasBtn').addEventListener('click', () => { if(confirm('Clear canvas?')) { elements = []; pushHistory(); renderCanvas(); selectedIndex=-1; } });
+
+      document.querySelector('[data-action="edit-text"]').addEventListener('click', () => { document.querySelector('.tab-btn[data-tab="content"]').click(); });
+      document.querySelector('[data-action="change-color"]').addEventListener('click', () => { document.querySelector('.tab-btn[data-tab="style"]').click(); });
+      document.querySelector('[data-action="align-left"]').addEventListener('click', () => applyAlignment('left'));
+      document.querySelector('[data-action="align-center"]').addEventListener('click', () => applyAlignment('center'));
+      document.querySelector('[data-action="align-right"]').addEventListener('click', () => applyAlignment('right'));
+      document.querySelector('[data-action="bring-forward"]').addEventListener('click', () => moveLayer(1));
+      document.querySelector('[data-action="send-backward"]').addEventListener('click', () => moveLayer(-1));
+      document.querySelector('[data-action="duplicate"]').addEventListener('click', () => document.getElementById('duplicateBtn').click());
+      document.querySelector('[data-action="delete"]').addEventListener('click', () => document.getElementById('deleteBtn').click());
+
+      function applyAlignment(align) { if(selectedIndex>=0) { if(!elements[selectedIndex].styles) elements[selectedIndex].styles = {}; elements[selectedIndex].styles.textAlign = align; renderCanvas(); pushHistory(); } }
+      function moveLayer(delta) {
+        if (selectedIndex<0) return;
+        const newIndex = selectedIndex + delta;
+        if (newIndex < 0 || newIndex >= elements.length) return;
+        [elements[selectedIndex], elements[newIndex]] = [elements[newIndex], elements[selectedIndex]];
+        selectedIndex = newIndex;
+        pushHistory(); renderCanvas();
+      }
+
+      document.getElementById('layersToggle').addEventListener('click', () => { layersPanel.classList.toggle('visible'); updateLayersList(); });
+      document.getElementById('closeLayersBtn').addEventListener('click', () => layersPanel.classList.remove('visible'));
+
+      document.querySelectorAll('.template-btn').forEach(btn => btn.addEventListener('click', (e) => {
+        const tpl = e.target.closest('.template-btn').dataset.template;
+        if (templatePresets[tpl]) {
+          elements = templatePresets[tpl]();
+          pushHistory(); renderCanvas(); selectedIndex=-1;
+        }
+      }));
+
+      document.getElementById('exportBtn').addEventListener('click', () => {
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{font-family:sans-serif;padding:24px;background:${getComputedStyle(document.body).getPropertyValue('--dark')};color:${getComputedStyle(document.body).getPropertyValue('--light')};}</style></head><body>`;
+        elements.forEach(el => {
+          if (el.tag === 'style') { html += `<style>${el.content}</style>`; return; }
+          const styles = el.styles ? Object.entries(el.styles).map(([k,v])=>`${k}:${v}`).join(';') : '';
+          if (el.type==='image') html += `<img src="${el.src}" style="${styles}">`;
+          else html += `<${el.tag} style="${styles}">${el.content||''}</${el.tag}>`;
+        });
+        html += `</body></html>`;
+        document.getElementById('exportCode').value = html;
+        document.getElementById('exportModal').style.display = 'flex';
+      });
+      document.getElementById('copyCodeBtn').addEventListener('click', () => { navigator.clipboard?.writeText(document.getElementById('exportCode').value); alert('Copied!'); });
+      document.getElementById('downloadBtn').addEventListener('click', () => {
+        const blob = new Blob([document.getElementById('exportCode').value], {type:'text/html'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'page.html'; a.click();
+      });
+      document.getElementById('closeModalBtn').addEventListener('click', () => document.getElementById('exportModal').style.display='none');
+
+      const themeBtn = document.getElementById('themeToggle');
+      themeBtn.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        themeBtn.innerHTML = document.body.classList.contains('light-mode') ? '<i class="fas fa-sun"></i> Dark' : '<i class="fas fa-moon"></i> Light';
+        renderCanvas();
+      });
+
+      document.querySelectorAll('[draggable]').forEach(el => el.addEventListener('dragstart', handleDragStart));
+    }
+
+    function updateSelected(prop, val) { if (selectedIndex>=0) { elements[selectedIndex][prop] = val; pushHistory(); renderCanvas(); } }
+
+    function init() {
+      const saved = localStorage.getItem('wc_desktop');
+      elements = saved ? JSON.parse(saved) : [];
+      pushHistory(); renderCanvas(); attachEvents();
+    }
+    init();
+  })();
+</script>
+</body>
+</html>
