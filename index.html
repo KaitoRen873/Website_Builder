@@ -56,11 +56,25 @@
       justify-content: space-between;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
-    .logo {
-      font-size: 1.8rem; font-weight: 700;
-      background: linear-gradient(135deg, var(--primary), var(--success));
-      -webkit-background-clip: text; background-clip: text;
-      color: transparent; text-shadow: 0 0 20px var(--primary-glow);
+    .site-name-input {
+      background: transparent;
+      border: 1px solid var(--gray);
+      border-radius: 40px;
+      padding: 0.5rem 1.2rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-shadow: 0 0 8px var(--primary-glow);
+      outline: none;
+      width: 280px;
+      transition: border 0.2s;
+    }
+    .site-name-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+    body.light-mode .site-name-input {
+      color: #1a1a2e;
     }
     .top-actions { display: flex; gap: 12px; }
     .btn {
@@ -281,7 +295,7 @@
 <body>
 <div class="app">
   <header class="top-bar">
-    <div class="logo">⚡ WebCraft Made By Riku Tenko</div>
+    <input type="text" id="siteNameInput" value="⚡ WebCraft" class="site-name-input" spellcheck="false" placeholder="Your Site Name">
     <div class="top-actions">
       <button class="btn" id="themeToggle"><i class="fas fa-moon"></i> Light</button>
       <button class="btn" id="layersToggle"><i class="fas fa-layer-group"></i> Layers</button>
@@ -516,6 +530,7 @@
     const quickToolbar = document.getElementById('quickToolbar');
     const layersPanel = document.getElementById('layersPanel');
     const layersList = document.getElementById('layersList');
+    const siteNameInput = document.getElementById('siteNameInput');
 
     function genId() { return 'el_' + Date.now() + '_' + Math.random().toString(36); }
 
@@ -826,7 +841,8 @@
       }));
 
       document.getElementById('exportBtn').addEventListener('click', () => {
-        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{font-family:sans-serif;padding:24px;background:${getComputedStyle(document.body).getPropertyValue('--dark')};color:${getComputedStyle(document.body).getPropertyValue('--light')};}</style></head><body>`;
+        const siteTitle = siteNameInput.value || 'WebCraft';
+        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${siteTitle}</title><style>body{font-family:sans-serif;padding:24px;background:${getComputedStyle(document.body).getPropertyValue('--dark')};color:${getComputedStyle(document.body).getPropertyValue('--light')};}</style></head><body>`;
         elements.forEach(el => {
           if (el.tag === 'style') { html += `<style>${el.content}</style>`; return; }
           const styles = el.styles ? Object.entries(el.styles).map(([k,v])=>`${k}:${v}`).join(';') : '';
