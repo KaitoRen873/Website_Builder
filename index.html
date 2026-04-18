@@ -37,7 +37,6 @@
       --glass: rgba(0, 0, 0, 0.03);
     }
     body.light-mode .website-canvas,
-    body.light-mode .element-card,
     body.light-mode .btn,
     body.light-mode .prop-group input,
     body.light-mode .prop-group select,
@@ -78,23 +77,96 @@
     .btn-primary { background: var(--primary); color: var(--darker); }
     .btn-danger:hover { background: var(--danger); box-shadow: 0 0 15px var(--danger-glow); }
     .main-layout { display: flex; flex: 1; overflow: hidden; }
+
+    /* LEFT PANEL */
     .left-panel {
-      width: 300px; background: var(--darker); border-right: 1px solid var(--gray);
+      width: 320px; background: var(--darker); border-right: 1px solid var(--gray);
       padding: 1.5rem 1rem; overflow-y: auto;
     }
     .panel-header h3 { color: var(--primary); text-shadow: 0 0 8px var(--primary-glow); }
     .hint { font-size: 0.8rem; opacity: 0.7; margin-bottom: 20px; }
-    .elements-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .element-card {
-      background: var(--glass); border: 1px solid var(--gray); border-radius: 16px;
-      padding: 14px 8px; text-align: center; cursor: grab; transition: 0.2s;
-      color: var(--light); backdrop-filter: blur(4px);
+
+    /* FLIP CARD GRID */
+    .elements-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
-    .element-card i { color: var(--primary); }
-    .element-card:hover {
-      background: var(--primary); color: var(--darker);
-      box-shadow: 0 0 18px var(--primary-glow); transform: translateY(-3px);
+    .flip-card {
+      width: 100%;
+      height: 130px;
+      perspective: 1000px;
+      cursor: grab;
     }
+    .flip-card:active { cursor: grabbing; }
+    .flip-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transition: transform 0.5s;
+      transform-style: preserve-3d;
+    }
+    .flip-card:hover .flip-inner {
+      transform: rotateY(180deg);
+    }
+    .flip-front, .flip-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 12px 8px;
+      text-align: center;
+      border: 1px solid var(--gray);
+      background: var(--glass);
+      backdrop-filter: blur(4px);
+      color: var(--light);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .flip-front i {
+      font-size: 1.8rem;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+    .flip-front span {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .flip-back {
+      transform: rotateY(180deg);
+      background: var(--primary);
+      color: var(--darker);
+      border-color: var(--primary);
+      justify-content: space-between;
+    }
+    .flip-back p {
+      font-size: 0.75rem;
+      margin: 6px 0;
+      font-weight: 500;
+    }
+    .help-btn {
+      background: var(--darker);
+      color: var(--primary);
+      border: none;
+      padding: 6px 10px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 4px;
+      width: 100%;
+    }
+    .help-btn:hover {
+      background: var(--success);
+      color: black;
+    }
+
+    /* Templates section */
     .templates-section { margin-top: 30px; border-top: 1px solid var(--gray); padding-top: 20px; }
     .templates-section h4 { color: var(--warning); margin-bottom: 12px; }
     .templates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -106,14 +178,10 @@
     }
     .template-btn i { width: 20px; color: var(--warning); }
     .template-btn:hover { background: var(--warning); color: var(--darker); }
-    .canvas-wrapper {
-      flex: 1; background: var(--dark); padding: 24px;
-      display: flex; flex-direction: column; overflow: auto; position: relative;
-    }
-    .floating-blocks {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 1; pointer-events: none;
-    }
+
+    /* Canvas */
+    .canvas-wrapper { flex: 1; background: var(--dark); padding: 24px; display: flex; flex-direction: column; overflow: auto; position: relative; }
+    .floating-blocks { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
     .floating-block {
       position: absolute; background: var(--glass); border: 1px solid var(--gray);
       border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
@@ -129,10 +197,7 @@
     .floating-block:nth-child(1) { width: 200px; height: 200px; top: 5%; left: 5%; }
     .floating-block:nth-child(2) { width: 150px; height: 150px; bottom: 15%; right: 10%; animation-delay: -5s; }
     .floating-block:nth-child(3) { width: 250px; height: 120px; top: 40%; left: 60%; animation-delay: -2s; }
-    .canvas-header {
-      display: flex; justify-content: space-between; margin-bottom: 16px;
-      color: var(--light); position: relative; z-index: 3;
-    }
+    .canvas-header { display: flex; justify-content: space-between; margin-bottom: 16px; color: var(--light); position: relative; z-index: 3; }
     .selected-info { font-weight: 600; color: var(--primary); }
     .canvas-container { flex: 1; display: flex; justify-content: center; position: relative; z-index: 3; }
     .website-canvas {
@@ -147,9 +212,7 @@
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       text-align: center; color: var(--light); opacity: 0.7; pointer-events: none;
     }
-    .canvas-element {
-      position: relative; margin: 12px 0; transition: outline 0.1s;
-    }
+    .canvas-element { position: relative; margin: 12px 0; transition: outline 0.1s; }
     .canvas-element.selected {
       outline: 2px solid var(--primary); outline-offset: 4px;
       border-radius: 8px; box-shadow: 0 0 20px var(--primary-glow);
@@ -158,86 +221,61 @@
       outline: 2px dashed var(--success); background: rgba(0,255,153,0.1);
       padding: 6px; border-radius: 8px;
     }
-    .quick-toolbar {
-      position: absolute; z-index: 100; display: none;
-      background: var(--darker); border: 1px solid var(--primary);
-      border-radius: 50px; padding: 6px 10px;
-      box-shadow: 0 0 20px var(--primary-glow);
-      backdrop-filter: blur(8px);
-      align-items: center; gap: 4px;
-    }
+
+    /* Quick Toolbar */
+    .quick-toolbar { position: absolute; z-index: 100; display: none; background: var(--darker); border: 1px solid var(--primary); border-radius: 50px; padding: 6px 10px; box-shadow: 0 0 20px var(--primary-glow); backdrop-filter: blur(8px); align-items: center; gap: 4px; }
     .quick-toolbar.visible { display: flex; }
-    .quick-btn {
-      background: transparent; border: none; color: var(--light);
-      width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: 0.2s; font-size: 1rem;
-    }
+    .quick-btn { background: transparent; border: none; color: var(--light); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; font-size: 1rem; }
     .quick-btn:hover { background: var(--primary); color: var(--darker); }
-    .layers-panel {
-      position: absolute; right: 360px; top: 120px; width: 220px;
-      background: var(--darker); border: 1px solid var(--primary);
-      border-radius: 20px; padding: 16px; box-shadow: 0 0 25px var(--primary-glow);
-      backdrop-filter: blur(8px); z-index: 200; display: none;
-    }
+    .layers-panel { position: absolute; right: 360px; top: 120px; width: 220px; background: var(--darker); border: 1px solid var(--primary); border-radius: 20px; padding: 16px; box-shadow: 0 0 25px var(--primary-glow); backdrop-filter: blur(8px); z-index: 200; display: none; }
     .layers-panel.visible { display: block; }
-    .layers-header {
-      display: flex; justify-content: space-between; align-items: center;
-      color: var(--primary); margin-bottom: 12px;
-    }
-    .layer-item {
-      padding: 8px 12px; margin: 4px 0; background: var(--glass);
-      border-radius: 12px; cursor: pointer; display: flex; align-items: center;
-      gap: 8px; color: var(--light); border: 1px solid transparent;
-    }
+    .layers-header { display: flex; justify-content: space-between; align-items: center; color: var(--primary); margin-bottom: 12px; }
+    .layer-item { padding: 8px 12px; margin: 4px 0; background: var(--glass); border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--light); border: 1px solid transparent; }
     .layer-item.active { border-color: var(--primary); background: var(--primary-glow); }
-    .right-panel {
-      width: 340px; background: var(--darker); border-left: 1px solid var(--gray);
-      display: flex; flex-direction: column;
-    }
-    .panel-tabs {
-      display: flex; border-bottom: 1px solid var(--gray); background: var(--glass);
-    }
+
+    /* RIGHT PANEL */
+    .right-panel { width: 340px; background: var(--darker); border-left: 1px solid var(--gray); display: flex; flex-direction: column; }
+    .panel-tabs { display: flex; border-bottom: 1px solid var(--gray); background: var(--glass); }
     .tab-btn {
       flex: 1; padding: 14px 4px; background: transparent; border: none;
       font-weight: 600; color: var(--light); opacity: 0.7; cursor: pointer;
       border-bottom: 2px solid transparent; transition: 0.2s;
     }
-    .tab-btn.active {
-      opacity: 1; color: var(--primary); border-bottom-color: var(--primary);
-      text-shadow: 0 0 8px var(--primary-glow);
-    }
+    .tab-btn.active { opacity: 1; color: var(--primary); border-bottom-color: var(--primary); text-shadow: 0 0 8px var(--primary-glow); }
     .panel-content { flex: 1; padding: 20px 16px; overflow-y: auto; }
     .tab-pane { display: none; }
     .tab-pane.active { display: block; }
-    .style-editor-header {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 20px;
-      padding-bottom: 12px; border-bottom: 1px solid var(--gray);
-    }
+    .style-editor-header { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--gray); }
     .style-editor-header i { color: var(--primary); font-size: 1.4rem; }
     .style-editor-header span { font-weight: 700; color: var(--primary); text-transform: uppercase; }
     .prop-group { margin-bottom: 20px; }
-    .prop-group label {
-      display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px;
-      color: var(--primary); text-transform: uppercase;
-    }
+    .prop-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; color: var(--primary); text-transform: uppercase; }
     .prop-group input, .prop-group select, .prop-group textarea {
       width: 100%; padding: 10px 12px; border: 1px solid var(--gray);
       border-radius: 14px; background: var(--glass); color: var(--light);
     }
-    .prop-group input:focus, .prop-group select:focus {
-      border-color: var(--primary); box-shadow: 0 0 12px var(--primary-glow);
+    .prop-group input:focus, .prop-group select:focus { border-color: var(--primary); box-shadow: 0 0 12px var(--primary-glow); }
+
+    /* HELP TAB */
+    .help-content {
+      background: var(--glass);
+      border-radius: 20px;
+      padding: 18px;
+      border: 1px solid var(--gray);
     }
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
-      align-items: center; justify-content: center; z-index: 1000;
+    .help-content h4 {
+      color: var(--primary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .modal-content {
-      background: var(--darker); border: 1px solid var(--primary);
-      box-shadow: 0 0 40px var(--primary-glow); color: var(--light);
-      padding: 28px; border-radius: 28px; width: 700px;
-    }
+    .help-content p { margin-bottom: 12px; line-height: 1.5; }
+    .close-help-btn { margin-top: 16px; width: 100%; }
+
+    /* Modal */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: var(--darker); border: 1px solid var(--primary); box-shadow: 0 0 40px var(--primary-glow); color: var(--light); padding: 28px; border-radius: 28px; width: 700px; }
   </style>
 </head>
 <body>
@@ -260,20 +298,9 @@
     <aside class="left-panel">
       <div class="panel-header">
         <h3>🧩 Components</h3>
-        <p class="hint">Drag onto canvas →</p>
+        <p class="hint">Hover to flip · Drag to canvas</p>
       </div>
-      <div class="elements-grid">
-        <div class="element-card" data-type="heading" draggable="true"><i class="fas fa-heading"></i> Heading</div>
-        <div class="element-card" data-type="paragraph" draggable="true"><i class="fas fa-paragraph"></i> Text</div>
-        <div class="element-card" data-type="image" draggable="true"><i class="fas fa-image"></i> Image</div>
-        <div class="element-card" data-type="button" draggable="true"><i class="fas fa-square"></i> Button</div>
-        <div class="element-card" data-type="divider" draggable="true"><i class="fas fa-minus"></i> Divider</div>
-        <div class="element-card" data-type="container" draggable="true"><i class="fas fa-cube"></i> Container</div>
-        <div class="element-card" data-type="card" draggable="true"><i class="fas fa-id-card"></i> Card</div>
-        <div class="element-card" data-type="navbar" draggable="true"><i class="fas fa-bars"></i> Navbar</div>
-        <div class="element-card" data-type="footer" draggable="true"><i class="fas fa-shoe-prints"></i> Footer</div>
-        <div class="element-card" data-type="grid" draggable="true"><i class="fas fa-th"></i> Grid</div>
-      </div>
+      <div class="elements-grid" id="elementsLibrary"></div>
       <div class="templates-section">
         <h4>📦 Templates (10)</h4>
         <div class="templates-grid">
@@ -286,7 +313,7 @@
           <button class="template-btn" data-template="comingsoon"><i class="fas fa-clock"></i> Coming Soon</button>
           <button class="template-btn" data-template="ecommerce"><i class="fas fa-shopping-cart"></i> eCommerce</button>
           <button class="template-btn" data-template="agency"><i class="fas fa-chart-line"></i> Agency</button>
-          <button class="template-btn" data-template="responsiveDemo"><i class="fas fa-mobile-alt"></i> Responsive Demo</button>
+          <button class="template-btn" data-template="responsiveDemo"><i class="fas fa-mobile-alt"></i> Responsive</button>
         </div>
       </div>
     </aside>
@@ -335,6 +362,7 @@
         <button class="tab-btn" data-tab="style">Style</button>
         <button class="tab-btn" data-tab="layout">Layout</button>
         <button class="tab-btn" data-tab="advanced">Advanced</button>
+        <button class="tab-btn" data-tab="help">Help</button>
       </div>
       <div class="panel-content" id="panelContent">
         <!-- Content Tab -->
@@ -379,6 +407,15 @@
           <button class="btn" id="duplicateBtn" style="width:100%; margin-bottom:10px;"><i class="fas fa-copy"></i> Duplicate</button>
           <button class="btn btn-danger" id="deleteBtn" style="width:100%;"><i class="fas fa-trash"></i> Delete</button>
         </div>
+        <!-- Help Tab -->
+        <div class="tab-pane" id="tab-help">
+          <div class="style-editor-header"><i class="fas fa-question-circle"></i><span>How to Use</span></div>
+          <div id="helpContentContainer" class="help-content">
+            <h4><i class="fas fa-info-circle"></i> Select a component</h4>
+            <p>Click "More Info" on any component card to see detailed instructions here.</p>
+          </div>
+          <button class="btn btn-outline close-help-btn" id="clearHelpBtn"><i class="fas fa-times"></i> Close Help</button>
+        </div>
       </div>
     </aside>
   </div>
@@ -400,73 +437,74 @@
 <script>
   (function(){
     "use strict";
+    // ---------- STATE ----------
     let elements = [];
     let selectedIndex = -1;
     let historyStack = [];
     let historyIndex = -1;
     const MAX_HISTORY = 50;
 
-    // Base templates
-    const defaultTemplates = {
-      heading: { tag:'h2', content:'Neon Heading', styles:{ fontSize:'36px', fontWeight:'bold', color:'var(--primary)', textShadow:'0 0 15px var(--primary-glow)' } },
-      paragraph: { tag:'p', content:'Your content here. Edit me!', styles:{ fontSize:'16px' } },
-      image: { tag:'img', src:'https://placehold.co/600x400/2a2a35/00ffff?text=NEON+IMAGE', styles:{ maxWidth:'100%', borderRadius:'16px' } },
-      button: { tag:'button', content:'Click Me', styles:{ padding:'14px 28px', background:'var(--primary)', color:'var(--darker)', border:'none', borderRadius:'40px', fontSize:'16px', fontWeight:'bold', boxShadow:'0 0 15px var(--primary-glow)' } },
-      divider: { tag:'hr', styles:{ margin:'24px 0', border:'1px solid var(--gray)' } },
-      container: { tag:'div', content:'', styles:{ padding:'24px', background:'var(--glass)', borderRadius:'20px', border:'1px solid var(--gray)' } },
-      card: { tag:'div', content:'<img src="https://placehold.co/300x180/1a1a2e/00ffff?text=CARD" style="width:100%;border-radius:16px"/><h3 style="margin-top:12px;">Card Title</h3><p>Description here</p>', styles:{ padding:'20px', background:'var(--glass)', borderRadius:'24px', border:'1px solid var(--gray)', boxShadow:'0 8px 20px rgba(0,0,0,0.3)' } },
-      navbar: { tag:'nav', content:'Home | About | Contact', styles:{ display:'flex', gap:'32px', padding:'18px', background:'var(--glass)', borderRadius:'40px', border:'1px solid var(--gray)' } },
-      footer: { tag:'footer', content:'© 2026 WebCraft — Built with ⚡', styles:{ padding:'24px', textAlign:'center', borderTop:'1px solid var(--gray)' } },
-      grid: { tag:'div', content:'<div>Item 1</div><div>Item 2</div><div>Item 3</div>', styles:{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'20px' } }
-    };
+    // Component library with help text
+    const componentLibrary = [
+      { type: 'heading', name: 'Heading', icon: 'fa-heading', help: 'Use headings to structure your page. Click to edit text. Style with font, size, and color.', default: { tag:'h2', content:'Neon Heading', styles:{ fontSize:'36px', fontWeight:'bold', color:'var(--primary)' } } },
+      { type: 'paragraph', name: 'Text', icon: 'fa-paragraph', help: 'Add paragraphs of text. Inline editing enabled. Adjust line height and alignment.', default: { tag:'p', content:'Your content here.', styles:{ fontSize:'16px' } } },
+      { type: 'image', name: 'Image', icon: 'fa-image', help: 'Insert images via URL. Resize using width/height controls. Supports border radius and shadows.', default: { tag:'img', src:'https://placehold.co/600x400/2a2a35/00ffff?text=IMAGE', styles:{ maxWidth:'100%', borderRadius:'16px' } } },
+      { type: 'button', name: 'Button', icon: 'fa-square', help: 'Call-to-action buttons. Edit label, colors, and add hover effects with custom CSS.', default: { tag:'button', content:'Click Me', styles:{ padding:'14px 28px', background:'var(--primary)', color:'var(--darker)', border:'none', borderRadius:'40px' } } },
+      { type: 'divider', name: 'Divider', icon: 'fa-minus', help: 'Horizontal rule to separate sections. Adjust margin and border style.', default: { tag:'hr', styles:{ margin:'24px 0', border:'1px solid var(--gray)' } } },
+      { type: 'container', name: 'Container', icon: 'fa-cube', help: 'A flexible box for grouping elements. Add background, padding, and borders.', default: { tag:'div', content:'', styles:{ padding:'24px', background:'var(--glass)', borderRadius:'20px' } } },
+      { type: 'card', name: 'Card', icon: 'fa-id-card', help: 'Pre-designed card with image, title, and text. Perfect for profiles or products.', default: { tag:'div', content:'<img src="https://placehold.co/300x180" style="width:100%"/><h3>Card</h3><p>Description</p>', styles:{ padding:'20px', background:'var(--glass)', borderRadius:'24px' } } },
+      { type: 'navbar', name: 'Navbar', icon: 'fa-bars', help: 'Navigation bar. Edit links and style with flex alignment.', default: { tag:'nav', content:'Home | About | Contact', styles:{ display:'flex', gap:'32px', padding:'18px', background:'var(--glass)' } } },
+      { type: 'footer', name: 'Footer', icon: 'fa-shoe-prints', help: 'Website footer. Usually contains copyright and links.', default: { tag:'footer', content:'© 2026 WebCraft', styles:{ padding:'24px', textAlign:'center' } } },
+      { type: 'grid', name: 'Grid', icon: 'fa-th', help: 'CSS Grid layout. Edit columns and gap. Add items inside.', default: { tag:'div', content:'<div>Item 1</div><div>Item 2</div><div>Item 3</div>', styles:{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'20px' } } }
+    ];
 
-    // Additional template presets (return arrays of elements)
+    // Template presets
     const templatePresets = {
       landing: () => [
-        { ...defaultTemplates.heading, content:'Build the Future', id:genId() },
-        { ...defaultTemplates.button, content:'Get Started', id:genId() },
-        { ...defaultTemplates.container, id:genId() }
+        { ...componentLibrary.find(c=>c.type==='heading').default, content:'Build the Future', id:genId() },
+        { ...componentLibrary.find(c=>c.type==='button').default, content:'Get Started', id:genId() },
+        { ...componentLibrary.find(c=>c.type==='container').default, id:genId() }
       ],
       portfolio: () => [
-        { ...defaultTemplates.heading, content:'My Work', id:genId() },
-        { ...defaultTemplates.grid, id:genId() }
+        { ...componentLibrary.find(c=>c.type==='heading').default, content:'My Work', id:genId() },
+        { ...componentLibrary.find(c=>c.type==='grid').default, id:genId() }
       ],
       blog: () => [
-        { ...defaultTemplates.heading, content:'Blog Post', id:genId() },
-        { ...defaultTemplates.paragraph, id:genId() }
+        { ...componentLibrary.find(c=>c.type==='heading').default, content:'Blog Post', id:genId() },
+        { ...componentLibrary.find(c=>c.type==='paragraph').default, id:genId() }
       ],
       business: () => [
-        { ...defaultTemplates.navbar, content:'🏢 Company | Services | Contact', id:genId() },
-        { ...defaultTemplates.heading, content:'Grow Your Business', styles:{ ...defaultTemplates.heading.styles, textAlign:'center' }, id:genId() },
-        { ...defaultTemplates.paragraph, content:'We provide innovative solutions.', styles:{ textAlign:'center' }, id:genId() },
-        { ...defaultTemplates.grid, content:'<div>Analytics</div><div>Team</div><div>Automation</div>', styles:{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'20px' }, id:genId() },
-        { ...defaultTemplates.button, content:'Get a Quote', id:genId() }
+        { ...componentLibrary.find(c=>c.type==='navbar').default, content:'🏢 Company | Services | Contact', id:genId() },
+        { ...componentLibrary.find(c=>c.type==='heading').default, content:'Grow Your Business', styles:{ ...componentLibrary.find(c=>c.type==='heading').default.styles, textAlign:'center' }, id:genId() },
+        { ...componentLibrary.find(c=>c.type==='paragraph').default, content:'We provide innovative solutions.', styles:{ textAlign:'center' }, id:genId() },
+        { ...componentLibrary.find(c=>c.type==='grid').default, content:'<div>Analytics</div><div>Team</div><div>Automation</div>', styles:{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'20px' }, id:genId() },
+        { ...componentLibrary.find(c=>c.type==='button').default, content:'Get a Quote', id:genId() }
       ],
       personal: () => [
-        { ...defaultTemplates.image, src:'https://placehold.co/200x200/00ffff/1a1a2e?text=Avatar', styles:{ width:'120px', borderRadius:'50%', margin:'0 auto', display:'block' }, id:genId() },
-        { ...defaultTemplates.heading, content:'Jane Doe', styles:{ textAlign:'center' }, id:genId() },
-        { ...defaultTemplates.paragraph, content:'Frontend Developer', styles:{ textAlign:'center' }, id:genId() }
+        { ...componentLibrary.find(c=>c.type==='image').default, src:'https://placehold.co/200x200/00ffff/1a1a2e?text=Avatar', styles:{ width:'120px', borderRadius:'50%', margin:'0 auto', display:'block' }, id:genId() },
+        { ...componentLibrary.find(c=>c.type==='heading').default, content:'Jane Doe', styles:{ textAlign:'center' }, id:genId() },
+        { ...componentLibrary.find(c=>c.type==='paragraph').default, content:'Frontend Developer', styles:{ textAlign:'center' }, id:genId() }
       ],
       restaurant: () => [
-        { ...defaultTemplates.heading, content:'🍽️ The Neon Bistro', styles:{ textAlign:'center' }, id:genId() },
-        { ...defaultTemplates.image, src:'https://placehold.co/600x300/ffaa00/1a1a2e?text=Delicious+Food', id:genId() },
-        { ...defaultTemplates.grid, content:'<div>Pizza</div><div>Burgers</div><div>Salads</div>', id:genId() }
+        { ...componentLibrary.find(c=>c.type==='heading').default, content:'🍽️ The Neon Bistro', styles:{ textAlign:'center' }, id:genId() },
+        { ...componentLibrary.find(c=>c.type==='image').default, src:'https://placehold.co/600x300/ffaa00/1a1a2e?text=Delicious+Food', id:genId() },
+        { ...componentLibrary.find(c=>c.type==='grid').default, content:'<div>Pizza</div><div>Burgers</div><div>Salads</div>', id:genId() }
       ],
       comingsoon: () => [
-        { ...defaultTemplates.container, content:'<h1>🚀 Something Awesome</h1><h2>Is Coming Soon</h2><p>We are working hard.</p>', styles:{ textAlign:'center', padding:'40px' }, id:genId() }
+        { ...componentLibrary.find(c=>c.type==='container').default, content:'<h1>🚀 Something Awesome</h1><h2>Is Coming Soon</h2><p>We are working hard.</p>', styles:{ textAlign:'center', padding:'40px' }, id:genId() }
       ],
       ecommerce: () => [
-        { ...defaultTemplates.navbar, content:'🛍️ Shop | Deals | Cart', id:genId() },
-        { ...defaultTemplates.heading, content:'Summer Sale', id:genId() },
-        { ...defaultTemplates.grid, content:'<div><img src="https://placehold.co/200/00ffff/1a1a2e?text=Product"/><p>$29</p></div><div><img src="https://placehold.co/200/ff0066/1a1a2e?text=Product"/><p>$49</p></div>', id:genId() }
+        { ...componentLibrary.find(c=>c.type==='navbar').default, content:'🛍️ Shop | Deals | Cart', id:genId() },
+        { ...componentLibrary.find(c=>c.type==='heading').default, content:'Summer Sale', id:genId() },
+        { ...componentLibrary.find(c=>c.type==='grid').default, content:'<div><img src="https://placehold.co/200/00ffff/1a1a2e?text=Product"/><p>$29</p></div><div><img src="https://placehold.co/200/ff0066/1a1a2e?text=Product"/><p>$49</p></div>', id:genId() }
       ],
       agency: () => [
-        { ...defaultTemplates.heading, content:'Creative Agency', id:genId() },
-        { ...defaultTemplates.paragraph, content:'We design brands that stand out.', id:genId() },
-        { ...defaultTemplates.container, content:'<h3>Our Work</h3><div style="display:flex;gap:16px;">Project A / Project B</div>', id:genId() }
+        { ...componentLibrary.find(c=>c.type==='heading').default, content:'Creative Agency', id:genId() },
+        { ...componentLibrary.find(c=>c.type==='paragraph').default, content:'We design brands that stand out.', id:genId() },
+        { ...componentLibrary.find(c=>c.type==='container').default, content:'<h3>Our Work</h3><div style="display:flex;gap:16px;">Project A / Project B</div>', id:genId() }
       ],
       responsiveDemo: () => [
-        { ...defaultTemplates.heading, content:'📱 Responsive Boxes Demo', styles:{ textAlign:'center' }, id:genId() },
+        { ...componentLibrary.find(c=>c.type==='heading').default, content:'📱 Responsive Boxes Demo', styles:{ textAlign:'center' }, id:genId() },
         { tag:'style', content:`.resp-container { display: flex; gap: 20px; } .resp-box { flex: 1; padding: 20px; background: #f2f2f2; color: #1a1a2e; border-radius: 16px; } @media (max-width: 768px) { .resp-container { flex-direction: column; } } @media (max-width: 480px) { .resp-box { padding: 15px; } }`, id:genId() },
         { tag:'div', content:'<div class="resp-container"><div class="resp-box">Box 1</div><div class="resp-box">Box 2</div><div class="resp-box">Box 3</div></div>', styles:{ marginTop:'20px' }, id:genId() }
       ]
@@ -480,6 +518,45 @@
     const layersList = document.getElementById('layersList');
 
     function genId() { return 'el_' + Date.now() + '_' + Math.random().toString(36); }
+
+    // Render flip cards
+    function renderComponentCards() {
+      const grid = document.getElementById('elementsLibrary');
+      grid.innerHTML = componentLibrary.map(comp => `
+        <div class="flip-card" data-type="${comp.type}" draggable="true">
+          <div class="flip-inner">
+            <div class="flip-front">
+              <i class="fas ${comp.icon}"></i>
+              <span>${comp.name}</span>
+            </div>
+            <div class="flip-back">
+              <p>${comp.help.substring(0, 60)}…</p>
+              <button class="help-btn" data-type="${comp.type}">📘 More Info</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      
+      document.querySelectorAll('.help-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const type = btn.dataset.type;
+          showHelpForComponent(type);
+        });
+      });
+    }
+
+    function showHelpForComponent(type) {
+      const comp = componentLibrary.find(c => c.type === type);
+      if (!comp) return;
+      const container = document.getElementById('helpContentContainer');
+      container.innerHTML = `
+        <h4><i class="fas ${comp.icon}"></i> ${comp.name}</h4>
+        <p>${comp.help}</p>
+        <p><strong>Quick tip:</strong> Drag this card onto the canvas to add it.</p>
+      `;
+      document.querySelector('.tab-btn[data-tab="help"]').click();
+    }
 
     function renderCanvas() {
       canvas.innerHTML = '';
@@ -534,7 +611,7 @@
 
     function highlightSelected() {
       document.querySelectorAll('.canvas-element').forEach(el => el.classList.remove('selected'));
-      if (selectedIndex >= 0 && canvas.children[selectedIndex] && canvas.children[selectedIndex].classList.contains('canvas-element')) {
+      if (selectedIndex >= 0 && canvas.children[selectedIndex] && canvas.children[selectedIndex].classList?.contains('canvas-element')) {
         canvas.children[selectedIndex].classList.add('selected');
         positionQuickToolbar(canvas.children[selectedIndex]);
         quickToolbar.classList.add('visible');
@@ -592,15 +669,16 @@
     }
 
     function updateLayersList() {
-      layersList.innerHTML = elements.filter(el => el.tag !== 'style').map((el, i) => {
+      const visibleElements = elements.filter(el => el.tag !== 'style');
+      layersList.innerHTML = visibleElements.map((el, i) => {
         const actualIndex = elements.indexOf(el);
         return `<div class="layer-item ${actualIndex === selectedIndex ? 'active' : ''}" data-index="${actualIndex}">
           <i class="fas fa-${el.type === 'image' ? 'image' : 'cube'}"></i>
-          <span style="flex:1;">${el.type || 'element'} ${actualIndex+1}</span>
+          <span style="flex:1;">${el.type || 'element'} ${i+1}</span>
         </div>`;
       }).join('');
       document.querySelectorAll('.layer-item').forEach(item => {
-        item.addEventListener('click', (e) => {
+        item.addEventListener('click', () => {
           const idx = parseInt(item.dataset.index);
           selectElement(idx);
           layersPanel.classList.remove('visible');
@@ -612,7 +690,7 @@
       const wrapper = e.target.closest('.canvas-element');
       if (wrapper) e.dataTransfer.setData('text/plain', `reorder:${wrapper.dataset.index}`);
       else {
-        const type = e.target.dataset.type;
+        const type = e.target.closest('.flip-card')?.dataset.type;
         if (type) e.dataTransfer.setData('text/plain', `new:${type}`);
       }
     }
@@ -626,11 +704,14 @@
       if (data.startsWith('new:')) addElement(data.split(':')[1]);
       else if (data.startsWith('reorder:')) {
         const fromIdx = parseInt(data.split(':')[1]);
-        const children = [...canvas.children].filter(c => c.classList.contains('canvas-element'));
+        const children = [...canvas.children].filter(c => c.classList?.contains('canvas-element'));
         let targetIdx = elements.length;
         const dropY = e.clientY;
         for (let i=0; i<children.length; i++) {
-          if (dropY < children[i].getBoundingClientRect().top + children[i].offsetHeight/2) { targetIdx = elements.indexOf(elements.find(el => canvas.children[Array.from(canvas.children).indexOf(children[i])] === children[i])); break; }
+          if (dropY < children[i].getBoundingClientRect().top + children[i].offsetHeight/2) {
+            targetIdx = elements.indexOf(elements.find((_, idx) => canvas.children[idx] === children[i]));
+            break;
+          }
         }
         if (fromIdx !== targetIdx) {
           const [moved] = elements.splice(fromIdx, 1);
@@ -641,7 +722,9 @@
     });
 
     function addElement(type) {
-      const tpl = defaultTemplates[type] || defaultTemplates.container;
+      const comp = componentLibrary.find(c => c.type === type);
+      if (!comp) return;
+      const tpl = comp.default;
       elements.push({ id: genId(), type, tag: tpl.tag, content: tpl.content || '', src: tpl.src, styles: { ...tpl.styles } });
       pushHistory(); renderCanvas(); selectElement(elements.length-1);
     }
@@ -760,6 +843,9 @@
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'page.html'; a.click();
       });
       document.getElementById('closeModalBtn').addEventListener('click', () => document.getElementById('exportModal').style.display='none');
+      document.getElementById('clearHelpBtn').addEventListener('click', () => {
+        document.getElementById('helpContentContainer').innerHTML = `<h4><i class="fas fa-info-circle"></i> Select a component</h4><p>Click "More Info" on any component card to see detailed instructions here.</p>`;
+      });
 
       const themeBtn = document.getElementById('themeToggle');
       themeBtn.addEventListener('click', () => {
@@ -774,9 +860,12 @@
     function updateSelected(prop, val) { if (selectedIndex>=0) { elements[selectedIndex][prop] = val; pushHistory(); renderCanvas(); } }
 
     function init() {
+      renderComponentCards();
       const saved = localStorage.getItem('wc_desktop');
       elements = saved ? JSON.parse(saved) : [];
-      pushHistory(); renderCanvas(); attachEvents();
+      pushHistory();
+      renderCanvas();
+      attachEvents();
     }
     init();
   })();
