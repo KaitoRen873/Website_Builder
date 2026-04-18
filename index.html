@@ -211,6 +211,54 @@
     .floating-block:nth-child(1) { width: 200px; height: 200px; top: 5%; left: 5%; }
     .floating-block:nth-child(2) { width: 150px; height: 150px; bottom: 15%; right: 10%; animation-delay: -5s; }
     .floating-block:nth-child(3) { width: 250px; height: 120px; top: 40%; left: 60%; animation-delay: -2s; }
+
+    /* Device Detector Banner */
+    .device-banner {
+      position: relative;
+      z-index: 3;
+      background: var(--glass);
+      border: 1px solid var(--gray);
+      border-radius: 40px;
+      padding: 8px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(4px);
+      font-size: 0.9rem;
+    }
+    .device-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .device-icon {
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+    .device-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .device-hint {
+      color: var(--warning);
+      font-size: 0.8rem;
+    }
+    .switch-preview-btn {
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: 0.2s;
+    }
+    .switch-preview-btn:hover {
+      background: var(--primary);
+      color: var(--darker);
+    }
+
     .canvas-header { display: flex; justify-content: space-between; margin-bottom: 16px; color: var(--light); position: relative; z-index: 3; }
     .selected-info { font-weight: 600; color: var(--primary); }
     .canvas-container { flex: 1; display: flex; justify-content: center; position: relative; z-index: 3; }
@@ -336,10 +384,23 @@
       <div class="floating-blocks">
         <div class="floating-block"></div><div class="floating-block"></div><div class="floating-block"></div>
       </div>
+
+      <!-- Device Detector Banner -->
+      <div class="device-banner" id="deviceBanner">
+        <div class="device-info">
+          <i class="fas fa-desktop device-icon" id="deviceIcon"></i>
+          <span id="deviceText">Detecting device...</span>
+        </div>
+        <div class="device-actions">
+          <span class="device-hint" id="deviceHint"></span>
+          <button class="switch-preview-btn" id="switchPreviewBtn">Switch preview</button>
+        </div>
+      </div>
+
       <div class="canvas-header">
         <span class="selected-info" id="selectedInfo">👆 Click any element to edit</span>
       </div>
-      <div class="canvas-container">
+      <div class="canvas-container" id="canvasContainer">
         <div class="website-canvas" id="canvas" dropzone="move">
           <div class="empty-canvas-message" id="emptyMessage">
             <i class="fas fa-hand-pointer"></i>
@@ -525,6 +586,7 @@
     };
 
     const canvas = document.getElementById('canvas');
+    const canvasContainer = document.getElementById('canvasContainer');
     const emptyMessage = document.getElementById('emptyMessage');
     const selectedInfo = document.getElementById('selectedInfo');
     const quickToolbar = document.getElementById('quickToolbar');
@@ -532,7 +594,61 @@
     const layersList = document.getElementById('layersList');
     const siteNameInput = document.getElementById('siteNameInput');
 
+    // Device detection elements
+    const deviceBanner = document.getElementById('deviceBanner');
+    const deviceIcon = document.getElementById('deviceIcon');
+    const deviceText = document.getElementById('deviceText');
+    const deviceHint = document.getElementById('deviceHint');
+    const switchPreviewBtn = document.getElementById('switchPreviewBtn');
+
     function genId() { return 'el_' + Date.now() + '_' + Math.random().toString(36); }
+
+    // Device detection function
+    function detectDevice() {
+      const width = window.innerWidth;
+      let deviceType, icon, hint, previewMode;
+      if (width < 768) {
+        deviceType = 'Mobile';
+        icon = 'fa-mobile-alt';
+        hint = '📱 Best on desktop';
+        previewMode = 'mobile';
+      } else if (width < 1024) {
+        deviceType = 'Tablet';
+        icon = 'fa-tablet-alt';
+        hint = '📟 Tablet detected';
+        previewMode = 'tablet';
+      } else {
+        deviceType = 'Desktop';
+        icon = 'fa-desktop';
+        hint = '💻 Desktop ready';
+        previewMode = 'desktop';
+      }
+      deviceIcon.className = `fas ${icon} device-icon`;
+      deviceText.textContent = `${deviceType} detected (${width}px)`;
+      deviceHint.textContent = hint;
+      
+      // Auto-set preview mode if not manually changed? Optional: we can set initial
+      if (!window.previewManuallySet) {
+        setPreviewMode(previewMode);
+      }
+    }
+
+    function setPreviewMode(mode) {
+      canvasContainer.className = 'canvas-container ' + mode;
+      document.querySelectorAll('.preview-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.device === mode) btn.classList.add('active');
+      });
+    }
+
+    // Switch preview button action
+    switchPreviewBtn.addEventListener('click', () => {
+      const width = window.innerWidth;
+      let targetMode = width < 768 ? 'mobile' : (width < 1024 ? 'tablet' : 'desktop');
+      setPreviewMode(targetMode);
+      window.previewManuallySet = true;
+      deviceHint.textContent = `Switched to ${targetMode} preview`;
+    });
 
     // Render flip cards
     function renderComponentCards() {
@@ -882,6 +998,11 @@
       pushHistory();
       renderCanvas();
       attachEvents();
+      
+      // Device detection
+      detectDevice();
+      window.addEventListener('resize', detectDevice);
+      window.previewManuallySet = false;
     }
     init();
   })();
