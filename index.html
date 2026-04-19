@@ -73,9 +73,7 @@
       border-color: var(--primary);
       box-shadow: 0 0 12px var(--primary-glow);
     }
-    body.light-mode .site-name-input {
-      color: #1a1a2e;
-    }
+    body.light-mode .site-name-input { color: #1a1a2e; }
     .top-actions { display: flex; gap: 12px; }
     .btn {
       padding: 0.6rem 1.4rem; border-radius: 40px; border: 1px solid var(--gray);
@@ -101,84 +99,36 @@
     .hint { font-size: 0.8rem; opacity: 0.7; margin-bottom: 20px; }
 
     /* FLIP CARD GRID */
-    .elements-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+    .elements-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .flip-card {
-      width: 100%;
-      height: 130px;
-      perspective: 1000px;
-      cursor: grab;
+      width: 100%; height: 130px; perspective: 1000px; cursor: grab;
     }
     .flip-card:active { cursor: grabbing; }
     .flip-inner {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transition: transform 0.5s;
-      transform-style: preserve-3d;
+      width: 100%; height: 100%; position: relative;
+      transition: transform 0.5s; transform-style: preserve-3d;
     }
-    .flip-card:hover .flip-inner {
-      transform: rotateY(180deg);
-    }
+    .flip-card:hover .flip-inner { transform: rotateY(180deg); }
     .flip-front, .flip-back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 16px;
-      backface-visibility: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 12px 8px;
-      text-align: center;
-      border: 1px solid var(--gray);
-      background: var(--glass);
-      backdrop-filter: blur(4px);
-      color: var(--light);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      position: absolute; width: 100%; height: 100%; border-radius: 16px;
+      backface-visibility: hidden; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; padding: 12px 8px;
+      text-align: center; border: 1px solid var(--gray); background: var(--glass);
+      backdrop-filter: blur(4px); color: var(--light); box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
-    .flip-front i {
-      font-size: 1.8rem;
-      color: var(--primary);
-      margin-bottom: 6px;
-    }
-    .flip-front span {
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
+    .flip-front i { font-size: 1.8rem; color: var(--primary); margin-bottom: 6px; }
+    .flip-front span { font-weight: 600; font-size: 0.9rem; }
     .flip-back {
-      transform: rotateY(180deg);
-      background: var(--primary);
-      color: var(--darker);
-      border-color: var(--primary);
-      justify-content: space-between;
+      transform: rotateY(180deg); background: var(--primary);
+      color: var(--darker); border-color: var(--primary); justify-content: space-between;
     }
-    .flip-back p {
-      font-size: 0.75rem;
-      margin: 6px 0;
-      font-weight: 500;
-    }
+    .flip-back p { font-size: 0.75rem; margin: 6px 0; font-weight: 500; }
     .help-btn {
-      background: var(--darker);
-      color: var(--primary);
-      border: none;
-      padding: 6px 10px;
-      border-radius: 30px;
-      font-size: 0.7rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-      margin-top: 4px;
-      width: 100%;
+      background: var(--darker); color: var(--primary); border: none;
+      padding: 6px 10px; border-radius: 30px; font-size: 0.7rem;
+      font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 4px; width: 100%;
     }
-    .help-btn:hover {
-      background: var(--success);
-      color: black;
-    }
+    .help-btn:hover { background: var(--success); color: black; }
 
     /* Templates section */
     .templates-section { margin-top: 30px; border-top: 1px solid var(--gray); padding-top: 20px; }
@@ -212,52 +162,23 @@
     .floating-block:nth-child(2) { width: 150px; height: 150px; bottom: 15%; right: 10%; animation-delay: -5s; }
     .floating-block:nth-child(3) { width: 250px; height: 120px; top: 40%; left: 60%; animation-delay: -2s; }
 
-    /* Device Detector Banner */
+    /* Device Banner */
     .device-banner {
-      position: relative;
-      z-index: 3;
-      background: var(--glass);
-      border: 1px solid var(--gray);
-      border-radius: 40px;
-      padding: 8px 16px;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      backdrop-filter: blur(4px);
-      font-size: 0.9rem;
+      position: relative; z-index: 3; background: var(--glass);
+      border: 1px solid var(--gray); border-radius: 40px; padding: 8px 16px;
+      margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;
+      backdrop-filter: blur(4px); font-size: 0.9rem;
     }
-    .device-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .device-icon {
-      color: var(--primary);
-      font-size: 1.2rem;
-    }
-    .device-actions {
-      display: flex;
-      gap: 8px;
-    }
-    .device-hint {
-      color: var(--warning);
-      font-size: 0.8rem;
-    }
+    .device-info { display: flex; align-items: center; gap: 10px; }
+    .device-icon { color: var(--primary); font-size: 1.2rem; }
+    .device-actions { display: flex; gap: 8px; }
+    .device-hint { color: var(--warning); font-size: 0.8rem; }
     .switch-preview-btn {
-      background: transparent;
-      border: 1px solid var(--primary);
-      color: var(--primary);
-      padding: 4px 12px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      transition: 0.2s;
+      background: transparent; border: 1px solid var(--primary);
+      color: var(--primary); padding: 4px 12px; border-radius: 20px;
+      cursor: pointer; font-size: 0.8rem; transition: 0.2s;
     }
-    .switch-preview-btn:hover {
-      background: var(--primary);
-      color: var(--darker);
-    }
+    .switch-preview-btn:hover { background: var(--primary); color: var(--darker); }
 
     .canvas-header { display: flex; justify-content: space-between; margin-bottom: 16px; color: var(--light); position: relative; z-index: 3; }
     .selected-info { font-weight: 600; color: var(--primary); }
@@ -335,16 +256,77 @@
     .help-content p { margin-bottom: 12px; line-height: 1.5; }
     .close-help-btn { margin-top: 16px; width: 100%; }
 
-    /* Modal */
+    /* WELCOME MODAL (Onboarding) */
+    .welcome-modal {
+      display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center; z-index: 1000;
+    }
+    .welcome-modal.hidden { display: none; }
+    .welcome-content {
+      background: var(--darker); border: 1px solid var(--primary);
+      box-shadow: 0 0 40px var(--primary-glow); color: var(--light);
+      padding: 32px; border-radius: 32px; max-width: 550px; width: 90%;
+    }
+    .welcome-content h2 { color: var(--primary); margin-bottom: 20px; display: flex; gap: 12px; align-items: center; }
+    .step-list { list-style: none; margin: 20px 0; }
+    .step-item {
+      display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start;
+    }
+    .step-number {
+      background: var(--primary); color: var(--darker); width: 28px; height: 28px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-weight: bold; flex-shrink: 0;
+    }
+    .step-text strong { color: var(--primary); }
+    .welcome-actions { display: flex; gap: 12px; margin-top: 24px; }
+    .dont-show-again { display: flex; align-items: center; gap: 8px; margin-top: 16px; color: var(--text-muted); }
+
+    /* Modal (Export) */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: var(--darker); border: 1px solid var(--primary); box-shadow: 0 0 40px var(--primary-glow); color: var(--light); padding: 28px; border-radius: 28px; width: 700px; }
   </style>
 </head>
 <body>
 <div class="app">
+  <!-- Welcome Onboarding Modal -->
+  <div class="welcome-modal" id="welcomeModal">
+    <div class="welcome-content">
+      <h2><i class="fas fa-hand-sparkles" style="color: var(--primary);"></i> Welcome to WebCraft!</h2>
+      <p style="margin-bottom: 8px;">Build beautiful websites with drag‑and‑drop ease. Here's how to get started:</p>
+      <ul class="step-list">
+        <li class="step-item">
+          <span class="step-number">1</span>
+          <span class="step-text"><strong>Add elements</strong> – Drag any component from the left panel onto the canvas.</span>
+        </li>
+        <li class="step-item">
+          <span class="step-number">2</span>
+          <span class="step-text"><strong>Edit content</strong> – Click any text to edit it inline, or use the right panel.</span>
+        </li>
+        <li class="step-item">
+          <span class="step-number">3</span>
+          <span class="step-text"><strong>Style everything</strong> – Select an element and use the Style/Layout tabs to change colors, spacing, and more.</span>
+        </li>
+        <li class="step-item">
+          <span class="step-number">4</span>
+          <span class="step-text"><strong>Save & Export</strong> – Save your project to your browser, then export as a real HTML file.</span>
+        </li>
+      </ul>
+      <p>💡 <strong>Quick tip:</strong> Hover over any component card to flip it and see a short description. Click "More Info" for detailed help.</p>
+      <div class="welcome-actions">
+        <button class="btn btn-primary" id="startBuildingBtn">Start Building</button>
+        <button class="btn btn-outline" id="closeWelcomeBtn">Maybe Later</button>
+      </div>
+      <div class="dont-show-again">
+        <input type="checkbox" id="dontShowAgainCheck"> <label for="dontShowAgainCheck">Don't show this again</label>
+      </div>
+    </div>
+  </div>
+
   <header class="top-bar">
     <input type="text" id="siteNameInput" value="⚡ WebCraft" class="site-name-input" spellcheck="false" placeholder="Your Site Name">
     <div class="top-actions">
+      <button class="btn" id="showGuideBtn"><i class="fas fa-question-circle"></i> Guide</button>
       <button class="btn" id="themeToggle"><i class="fas fa-moon"></i> Light</button>
       <button class="btn" id="layersToggle"><i class="fas fa-layer-group"></i> Layers</button>
       <button class="btn" id="undoBtn"><i class="fas fa-undo-alt"></i> Undo</button>
@@ -519,7 +501,7 @@
     let historyIndex = -1;
     const MAX_HISTORY = 50;
 
-    // Component library with help text
+    // Component library (same as before)
     const componentLibrary = [
       { type: 'heading', name: 'Heading', icon: 'fa-heading', help: 'Use headings to structure your page. Click to edit text. Style with font, size, and color.', default: { tag:'h2', content:'Neon Heading', styles:{ fontSize:'36px', fontWeight:'bold', color:'var(--primary)' } } },
       { type: 'paragraph', name: 'Text', icon: 'fa-paragraph', help: 'Add paragraphs of text. Inline editing enabled. Adjust line height and alignment.', default: { tag:'p', content:'Your content here.', styles:{ fontSize:'16px' } } },
@@ -533,7 +515,7 @@
       { type: 'grid', name: 'Grid', icon: 'fa-th', help: 'CSS Grid layout. Edit columns and gap. Add items inside.', default: { tag:'div', content:'<div>Item 1</div><div>Item 2</div><div>Item 3</div>', styles:{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'20px' } } }
     ];
 
-    // Template presets
+    // Template presets (same)
     const templatePresets = {
       landing: () => [
         { ...componentLibrary.find(c=>c.type==='heading').default, content:'Build the Future', id:genId() },
@@ -601,47 +583,36 @@
     const deviceHint = document.getElementById('deviceHint');
     const switchPreviewBtn = document.getElementById('switchPreviewBtn');
 
+    // Welcome modal elements
+    const welcomeModal = document.getElementById('welcomeModal');
+    const startBuildingBtn = document.getElementById('startBuildingBtn');
+    const closeWelcomeBtn = document.getElementById('closeWelcomeBtn');
+    const dontShowAgainCheck = document.getElementById('dontShowAgainCheck');
+    const showGuideBtn = document.getElementById('showGuideBtn');
+
     function genId() { return 'el_' + Date.now() + '_' + Math.random().toString(36); }
 
-    // Device detection function
+    // Device detection
     function detectDevice() {
       const width = window.innerWidth;
       let deviceType, icon, hint, previewMode;
       if (width < 768) {
-        deviceType = 'Mobile';
-        icon = 'fa-mobile-alt';
-        hint = '📱 Best on desktop';
-        previewMode = 'mobile';
+        deviceType = 'Mobile'; icon = 'fa-mobile-alt'; hint = '📱 Best on desktop'; previewMode = 'mobile';
       } else if (width < 1024) {
-        deviceType = 'Tablet';
-        icon = 'fa-tablet-alt';
-        hint = '📟 Tablet detected';
-        previewMode = 'tablet';
+        deviceType = 'Tablet'; icon = 'fa-tablet-alt'; hint = '📟 Tablet detected'; previewMode = 'tablet';
       } else {
-        deviceType = 'Desktop';
-        icon = 'fa-desktop';
-        hint = '💻 Desktop ready';
-        previewMode = 'desktop';
+        deviceType = 'Desktop'; icon = 'fa-desktop'; hint = '💻 Desktop ready'; previewMode = 'desktop';
       }
       deviceIcon.className = `fas ${icon} device-icon`;
       deviceText.textContent = `${deviceType} detected (${width}px)`;
       deviceHint.textContent = hint;
-      
-      // Auto-set preview mode if not manually changed? Optional: we can set initial
-      if (!window.previewManuallySet) {
-        setPreviewMode(previewMode);
-      }
+      if (!window.previewManuallySet) setPreviewMode(previewMode);
     }
 
     function setPreviewMode(mode) {
       canvasContainer.className = 'canvas-container ' + mode;
-      document.querySelectorAll('.preview-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.device === mode) btn.classList.add('active');
-      });
     }
 
-    // Switch preview button action
     switchPreviewBtn.addEventListener('click', () => {
       const width = window.innerWidth;
       let targetMode = width < 768 ? 'mobile' : (width < 1024 ? 'tablet' : 'desktop');
@@ -649,6 +620,17 @@
       window.previewManuallySet = true;
       deviceHint.textContent = `Switched to ${targetMode} preview`;
     });
+
+    // Welcome modal logic
+    function showWelcomeModal() {
+      welcomeModal.classList.remove('hidden');
+    }
+    function hideWelcomeModal(remember) {
+      welcomeModal.classList.add('hidden');
+      if (remember && dontShowAgainCheck.checked) {
+        localStorage.setItem('wc_welcome_dismissed', 'true');
+      }
+    }
 
     // Render flip cards
     function renderComponentCards() {
@@ -987,6 +969,11 @@
       });
 
       document.querySelectorAll('[draggable]').forEach(el => el.addEventListener('dragstart', handleDragStart));
+
+      // Welcome modal events
+      startBuildingBtn.addEventListener('click', () => hideWelcomeModal(true));
+      closeWelcomeBtn.addEventListener('click', () => hideWelcomeModal(false));
+      showGuideBtn.addEventListener('click', () => { welcomeModal.classList.remove('hidden'); });
     }
 
     function updateSelected(prop, val) { if (selectedIndex>=0) { elements[selectedIndex][prop] = val; pushHistory(); renderCanvas(); } }
@@ -1003,6 +990,13 @@
       detectDevice();
       window.addEventListener('resize', detectDevice);
       window.previewManuallySet = false;
+
+      // Show welcome modal if not dismissed
+      if (!localStorage.getItem('wc_welcome_dismissed')) {
+        showWelcomeModal();
+      } else {
+        welcomeModal.classList.add('hidden');
+      }
     }
     init();
   })();
